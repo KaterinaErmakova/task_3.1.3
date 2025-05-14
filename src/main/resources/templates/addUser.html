@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Add User</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+<h1>Add New User</h1>
+<form id="addUserForm">
+    <label>Name: <input type="text" id="name" required></label><br/>
+    <label>Surname: <input type="text" id="surname" required></label><br/>
+    <label>Age: <input type="number" id="age" required></label><br/>
+    <label>Phone Number: <input type="text" id="phoneNumber" required></label><br/>
+    <label>Password: <input type="text" id="password" required></label><br/>
+
+    <label>Roles:
+        <select id="roles" multiple required>
+            <option value="ROLE_USER">USER</option>
+            <option value="ROLE_ADMIN">ADMIN</option>
+        </select>
+    </label><br/>
+
+    <button type="submit">Save</button>
+</form>
+
+<a href="/admin">Back to list</a>
+
+<form th:action="@{/logout}" method="post">
+    <button type="submit">Logout</button>
+</form>
+
+<script>
+    document.getElementById('addUserForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const rolesSelect = document.getElementById('roles');
+        const selectedRoles = Array.from(rolesSelect.selectedOptions).map(option => ({
+            name: option.value
+        }));
+
+        if (selectedRoles.length === 0) {
+            alert('Пожалуйста, выберите хотя бы одну роль.');
+            return;
+        }
+
+        const user = {
+            name: document.getElementById('name').value,
+            surname: document.getElementById('surname').value,
+            age: parseInt(document.getElementById('age').value),
+            phoneNumber: document.getElementById('phoneNumber').value,
+            password: document.getElementById('password').value,
+            roles: selectedRoles
+        };
+
+        fetch('/admin/save_user', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(user)
+        }).then(response => {
+            if (response.ok) {
+                window.location.href = '/admin';
+            } else {
+                alert('Ошибка при сохранении пользователя');
+            }
+        });
+    });
+</script>
+
+
+
+</body>
+</html>
