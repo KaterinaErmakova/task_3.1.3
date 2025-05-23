@@ -4,8 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
-import ru.kata.spring.boot_security.demo.models.Role;
-import ru.kata.spring.boot_security.demo.models.User;
+import ru.kata.spring.boot_security.demo.dto.RoleDto;
+import ru.kata.spring.boot_security.demo.dto.UserDTO;
 import ru.kata.spring.boot_security.demo.service.RoleService;
 import ru.kata.spring.boot_security.demo.service.UserService;
 
@@ -39,34 +39,34 @@ public class AdminController {
 
 
     @PostMapping("/save_user")
-    public String saveUser(@RequestBody User user) {
-        user.setRoles(
-                user.getRoles().stream()
-                        .map(role -> roleService.findByName(role.getName()))
+    public String saveUser(@RequestBody UserDTO userDTO) {
+        userDTO.setRoles(
+                userDTO.getRoles().stream()
+                        .map(role -> roleService.findByName(role.getName())).map(RoleDto::new)
                         .collect(Collectors.toSet())
         );
 
-        userService.saveUser(user);
+        userService.saveUser(userDTO);
         return "redirect:/admin";
     }
 
     @GetMapping("/edit_user")
     public String showEditUserForm(@RequestParam("id") int id, ModelMap model) {
-        User user = userService.getUserById(id);
-        List<Role> allRoles = roleService.getAllRoles();
-        model.addAttribute("user", user);
+        UserDTO userDTO = userService.getUserById(id);
+        List<RoleDto> allRoles = roleService.getAllRoles();
+        model.addAttribute("user", userDTO);
         model.addAttribute("allRoles", allRoles);
         return "editUser";
     }
 
     @PostMapping("/update_user")
-    public String updateUser(@RequestBody User user) {
-        user.setRoles(
-                user.getRoles().stream()
-                        .map(role -> roleService.findByName(role.getName()))
+    public String updateUser(@RequestBody UserDTO userDTO) {
+        userDTO.setRoles(
+                userDTO.getRoles().stream()
+                        .map(role -> roleService.findByName(role.getName())).map(RoleDto::new)
                         .collect(Collectors.toSet())
         );
-        userService.updateUser(user.getId(), user);
+        userService.updateUser(userDTO.getId(), userDTO);
         return "redirect:/admin";
     }
 
